@@ -73,28 +73,31 @@ Finished
 ```
 
 The `Git` repository is a database that contains
-    - all commits (the history of the project)
-    - file contents (`blob` objects)
-    - and the directory structure (`tree` objects)
+- all commits (the history of the project)
+- file contents (`blob` objects)
+- and the directory structure (`tree` objects)
+
 
 A commit is essentially a snapshot of the project.
 
 Every commit contains a reference to a tree object, which describes:
-    - which files exist
-    - where they are located
-    - and what each file contains
+- which files exist
+- where they are located
+- and what each file contains
+
 
 When you change something in the project and make a new commit, you don't update an existing commit. Instead, you create a new commit, which references a new `tree` (if the structure or contents changed), and also references the previous commit. This way, each commit is linked to the one before it, forming a chain of history.
 
-The object of 'git` have that structure:
-  - commit: reference to the `tree`, contain commit creator's name, metadates, comments
-  - tree: describes the structure of dirictories, namely, files, dirictories and their privileges
-  - blob (binary large object): contain the file content
-  - tag: reference to the other object, usually it's a `commit`
+The object of `git` have that structure
+- commit: reference to the `tree`, contain commit creator's name, metadates, comments
+- tree: describes the structure of dirictories, namely, files, dirictories and their privileges
+- blob (binary large object): contain the file content
+- tag: reference to the other object, usually it's a `commit`
+
 
 The .git directory has the following structure:
-    /index: contains the content of files that are staged and will be included in the next commit
-    /info: contains additional configuration files, such as `exclude`, which defines files and directories that should be ignored by `git` (similar to `.gitignore`, but local and not versioned)
+- /index: contains the content of files that are staged and will be included in the next commit
+- /info: contains additional configuration files, such as `exclude`, which defines files and directories that should be ignored by `git` (similar to `.gitignore`, but local and not versioned)
 
 ```
 Hexada@hexada ~/Downloads$ curl http://cat.htb/.git/HEAD                                                                                                                                  
