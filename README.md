@@ -3,6 +3,8 @@
 
 ### --- USER FLAG ---
 
+As always, we start with a scan
+
 ```
 sudo nmap -sC -sV -p- -T5 --max-rate 10000 10.10.11.53
 
@@ -37,73 +39,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 349.36 seconds
 ```
 
-```
-Hexada@hexada ~/Downloads$ gobuster dir -u http://cat.htb -w ~/app/pentesting-wordlists/SecLists/Discovery/Web-Content/directory-list-2.3-medium.txt                                       
-===============================================================
-Gobuster v3.6
-by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
-===============================================================
-[+] Url:                     http://cat.htb
-[+] Method:                  GET
-[+] Threads:                 10
-[+] Wordlist:                /home/Hexada/app/pentesting-wordlists/SecLists/Discovery/Web-Content/directory-list-2.3-medium.txt
-[+] Negative Status codes:   404
-[+] User Agent:              gobuster/3.6
-[+] Timeout:                 10s
-===============================================================
-Starting gobuster in directory enumeration mode
-===============================================================
-/img                  (Status: 301) [Size: 300] [--> http://cat.htb/img/]
-/uploads              (Status: 301) [Size: 304] [--> http://cat.htb/uploads/]
-/css                  (Status: 301) [Size: 300] [--> http://cat.htb/css/]
-/winners              (Status: 301) [Size: 304] [--> http://cat.htb/winners/]
-/server-status        (Status: 403) [Size: 272]
-Progress: 220559 / 220560 (100.00%)
-===============================================================
-Finished
-===============================================================
-```
-
-```
-POST /contest.php HTTP/1.1
-Host: cat.htb
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
-Accept-Language: en-US,en;q=0.5
-Accept-Encoding: gzip, deflate, br
-Content-Type: multipart/form-data; boundary=----geckoformboundarybd5374079d18108187245d6c7c59c63e
-Content-Length: 697
-Origin: http://cat.htb
-Connection: keep-alive
-Referer: http://cat.htb/contest.php
-Cookie: PHPSESSID=9qr30345sfdv0qmc304igt0dke
-Upgrade-Insecure-Requests: 1
-Sec-GPC: 1
-Priority: u=0, i
-
-------geckoformboundarybd5374079d18108187245d6c7c59c63e
-Content-Disposition: form-data; name="cat_name"
-
-Cotino
-------geckoformboundarybd5374079d18108187245d6c7c59c63e
-Content-Disposition: form-data; name="age"
-
-1717
-------geckoformboundarybd5374079d18108187245d6c7c59c63e
-Content-Disposition: form-data; name="birthdate"
-
-2025-04-09
-------geckoformboundarybd5374079d18108187245d6c7c59c63e
-Content-Disposition: form-data; name="weight"
-
-0.04
-------geckoformboundarybd5374079d18108187245d6c7c59c63e
-Content-Disposition: form-data; name="cat_photo"; filename="shell"
-Content-Type: application/octet-stream
-
-hello world
-------geckoformboundarybd5374079d18108187245d6c7c59c63e--
-```
+Great, we found a very good leak, it's the `.git` directory.
 
 ```
 Hexada@hexada ~/Downloads$ gobuster dir -u http://cat.htb/.git -w ~/app/pentesting-wordlists/SecLists/Discovery/Web-Content/directory-list-2.3-medium.txt                                  
@@ -136,9 +72,36 @@ Finished
 ===============================================================
 ```
 
+The `Git` repository is a database that contains
+    - all commits (the history of the project)
+    - file contents (`blob` objects)
+    - and the directory structure (`tree` objects)
+
+A commit is essentially a snapshot of the project.
+
+Every commit contains a reference to a tree object, which describes:
+    - which files exist
+    - where they are located
+    - and what each file contains
+
+When you change something in the project and make a new commit, you don't update an existing commit. Instead, you create a new commit, which references a new `tree` (if the structure or contents changed), and also references the previous commit. This way, each commit is linked to the one before it, forming a chain of history.
+
+The object of 'git` have that structure:
+  - commit: reference to the `tree`, contain commit creator's name, metadates, comments
+  - tree: describes the structure of dirictories, namely, files, dirictories and their privileges
+  - blob (binary large object): contain the file content
+  - tag: reference to the other object, usually it's a `commit`
+
+The .git directory has the following structure:
+    /index: contains the content of files that are staged and will be included in the next commit
+    /info: contains additional configuration files, such as `exclude`, which defines files and directories that should be ignored by `git` (similar to `.gitignore`, but local and not versioned)
+
 ```
-Hexada@hexada ~/Downloads$ curl http://cat.htb/.git//HEAD                                                                                                                                  
+Hexada@hexada ~/Downloads$ curl http://cat.htb/.git/HEAD                                                                                                                                  
 ref: refs/heads/master
+```
+
+```
 Hexada@hexada ~/Downloads$ curl http://cat.htb/.git/refs/heads/master                                                                                                                      
 8c2c2701eb4e3c9a42162cfb7b681b6166287fd5
 ```
